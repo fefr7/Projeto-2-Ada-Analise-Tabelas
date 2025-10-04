@@ -15,15 +15,15 @@ public class CSVReader {
 
     private static final String RESOURCES_PATH = "resources/";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final String DELIMITER = ","; // CORREÇÃO: Uso de ponto e vírgula como delimitador
+    private static final String DELIMITER = ","; 
     
     public static <T> List<T> read(String filename, Function<String[], T> mapper) throws IOException {
         String filePath = RESOURCES_PATH + filename;
         
-        try (Stream<String> lines = Files.lines(Paths.get(filePath), StandardCharsets.ISO_8859_1)) { // CORREÇÃO: Encoding
+        try (Stream<String> lines = Files.lines(Paths.get(filePath), StandardCharsets.ISO_8859_1)) { 
             return lines
                     .skip(1) 
-                    .map(line -> line.split(DELIMITER, -1)) // Usa o delimitador ;
+                    .map(line -> line.split(DELIMITER, -1))
                     .filter(columns -> columns.length > 1) 
                     .map(mapper) 
                     .toList(); 
@@ -40,7 +40,7 @@ public class CSVReader {
 
     public static int parseInt(String intStr) {
         try {
-            String cleanedStr = intStr.replace("\"", "").trim(); // Lida com aspas duplas
+            String cleanedStr = intStr.replace("\"", "").trim(); 
             return Integer.parseInt(cleanedStr); 
         } catch (NumberFormatException e) {
             return 0; 
