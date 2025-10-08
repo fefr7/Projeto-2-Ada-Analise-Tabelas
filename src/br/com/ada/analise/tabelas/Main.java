@@ -5,62 +5,82 @@ import br.com.ada.analise.tabelas.model.Gol;
 import br.com.ada.analise.tabelas.model.Partida;
 import br.com.ada.analise.tabelas.service.AnaliseService;
 import br.com.ada.analise.tabelas.util.CSVReader;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.*;
 
 public class Main {
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException {
         System.out.println("--- Projeto 2 Ada Analise tabelas: Campeonato Brasileiro ---");
+
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+
         try {
-            List<Partida> partidas = CSVReader.read("campeonato-brasileiro-full.csv", 
-                columns -> new Partida(
-                    CSVReader.parseInt(columns[0]),
-                    columns[1],
-                    CSVReader.parseDate(columns[2]),
-                    columns[3],
-                    columns[4],
-                    columns[5],
-                    columns[6],
-                    columns[10],
-                    columns[11],
-                    CSVReader.parseInt(columns[12]),
-                    CSVReader.parseInt(columns[13]),
-                    columns[14],
-                    columns[15]
-                )
-            );
+            Callable<List<Partida>> taskPartidas = () -> 
+                CSVReader.read("campeonato-brasileiro-full.csv", 
+                    columns -> new Partida(
+                        CSVReader.parseInt(columns[0]), 
+                        columns[1],                      
+                        CSVReader.parseDate(columns[2]), 
+                        columns[3],                      
+                        columns[4],                      
+                        columns[5],                      
+                        columns[6],                      
+                        columns[10],                     
+                        columns[11],                     
+                        CSVReader.parseInt(columns[12]), 
+                        CSVReader.parseInt(columns[13]), 
+                        columns[14],                     
+                        columns[15]                      
+                    )
+                );
 
-            List<Gol> gols = CSVReader.read("campeonato-brasileiro-gols.csv", 
-                columns -> new Gol(
-                    CSVReader.parseInt(columns[0]),
-                    columns[1],
-                    columns[2],
-                    columns[3],
-                    columns[4],
-                    columns[5]
-                )
-            );
+            Callable<List<Gol>> taskGols = () -> 
+                CSVReader.read("campeonato-brasileiro-gols.csv", 
+                    columns -> new Gol(
+                        CSVReader.parseInt(columns[0]), 
+                        columns[1],                     
+                        columns[2],                     
+                        columns[3],                     
+                        columns[4],                     
+                        columns[5]                      
+                    )
+                );
 
-            List<Cartao> cartoes = CSVReader.read("campeonato-brasileiro-cartoes.csv", 
-                columns -> new Cartao(
-                    CSVReader.parseInt(columns[0]),
-                    columns[1],
-                    columns[2],
-                    columns[3],
-                    columns[4],
-                    columns[5],
-                    columns[6],
-                    columns[7]
-                )
-            );
+            Callable<List<Cartao>> taskCartoes = () -> 
+                CSVReader.read("campeonato-brasileiro-cartoes.csv", 
+                    columns -> new Cartao(
+                        CSVReader.parseInt(columns[0]), 
+                        columns[1],                     
+                        columns[2],                     
+                        columns[3],                     
+                        columns[4],                     
+                        columns[5],                     
+                        columns[6],                     
+                        columns[7]                      
+                    )
+                );
+
+            Future<List<Partida>> futurePartidas = executor.submit(taskPartidas);
+            Future<List<Gol>> futureGols = executor.submit(taskGols);
+            Future<List<Cartao>> futureCartoes = executor.submit(taskCartoes);
+
+            List<Partida> partidas = futurePartidas.get();
+            List<Gol> gols = futureGols.get();
+            List<Cartao> cartoes = futureCartoes.get();
             
+            executor.shutdown();
+
+
             System.out.printf("\nDados carregados: %d partidas, %d gols, %d cartões.\n", 
                                 partidas.size(), gols.size(), cartoes.size());
 
             AnaliseService analiseService = new AnaliseService(partidas, gols, cartoes);
-            
+
             System.out.println("\n--- RESULTADOS DA ANÁLISE ---");
 
             analiseService.timeComMaisVitoriasEm(2008).ifPresent(e -> 
@@ -83,9 +103,9 @@ public class Main {
                 System.out.printf("Placar da partida com mais gols (%d): **%s %d x %d %s** (Data: %s).\n", 
                                   p.getTotalGols(), p.mandante(), p.placarMandante(), 
                                   p.placarVisitante(), p.visitante(), p.data()));
-                                  
-        } catch (IOException e) {
-            System.err.println("\nERRO: Falha ao carregar arquivos CSV. Verifique se eles estão na pasta 'resources' e se o delimitador está correto (';').");
+
+        } catch (InterruptedException | ExecutionException e) {
+            System.err.println("\nERRO: Falha na execução paralela da leitura dos arquivos: " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
             System.err.println("\nERRO: Ocorreu um erro durante a análise: " + e.getMessage());
