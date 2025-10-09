@@ -78,8 +78,6 @@ public class Main {
             System.out.printf("\nDados carregados: %d partidas, %d gols, %d cartões.\n", 
                                 partidas.size(), gols.size(), cartoes.size());
 
-            System.out.println(partidas.get(0).data());
-
             AnaliseService analiseService = new AnaliseService(partidas, gols, cartoes);
 
             System.out.println("\n--- RESULTADOS DA ANÁLISE ---");
