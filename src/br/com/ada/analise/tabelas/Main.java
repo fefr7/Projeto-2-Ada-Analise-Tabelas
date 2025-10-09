@@ -5,7 +5,6 @@ import br.com.ada.analise.tabelas.model.Gol;
 import br.com.ada.analise.tabelas.model.Partida;
 import br.com.ada.analise.tabelas.service.AnaliseService;
 import br.com.ada.analise.tabelas.util.CSVReader;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -24,18 +23,18 @@ public class Main {
                 CSVReader.read("campeonato-brasileiro-full.csv", 
                     columns -> new Partida(
                         CSVReader.parseInt(columns[0]), 
-                        columns[1],                      
+                        CSVReader.clean(columns[1]),                      
                         CSVReader.parseDate(columns[2]), 
-                        columns[3],                      
-                        columns[4],                      
-                        columns[5],                      
-                        columns[6],                      
-                        columns[10],                     
-                        columns[11],                     
+                        CSVReader.clean(columns[3]),                      
+                        CSVReader.clean(columns[4]),                      
+                        CSVReader.clean(columns[5]),                      
+                        CSVReader.clean(columns[6]),                      
+                        CSVReader.clean(columns[10]),                     
+                        CSVReader.clean(columns[11]),                     
                         CSVReader.parseInt(columns[12]), 
                         CSVReader.parseInt(columns[13]), 
-                        columns[14],                     
-                        columns[15]                      
+                        CSVReader.clean(columns[14]),                     
+                        CSVReader.clean(columns[15])                      
                     )
                 );
 
@@ -43,11 +42,11 @@ public class Main {
                 CSVReader.read("campeonato-brasileiro-gols.csv", 
                     columns -> new Gol(
                         CSVReader.parseInt(columns[0]), 
-                        columns[1],                     
-                        columns[2],                     
-                        columns[3],                     
-                        columns[4],                     
-                        columns[5]                      
+                        CSVReader.clean(columns[1]),                     
+                        CSVReader.clean(columns[2]),                     
+                        CSVReader.clean(columns[3]),                     
+                        CSVReader.clean(columns[4]),                     
+                        CSVReader.clean(columns[5])                      
                     )
                 );
 
@@ -55,13 +54,13 @@ public class Main {
                 CSVReader.read("campeonato-brasileiro-cartoes.csv", 
                     columns -> new Cartao(
                         CSVReader.parseInt(columns[0]), 
-                        columns[1],                     
-                        columns[2],                     
-                        columns[3],                     
-                        columns[4],                     
-                        columns[5],                     
-                        columns[6],                     
-                        columns[7]                      
+                        CSVReader.clean(columns[1]),                     
+                        CSVReader.clean(columns[2]),                     
+                        CSVReader.clean(columns[3]),                     
+                        CSVReader.clean(columns[4]),                     
+                        CSVReader.clean(columns[5]),                     
+                        CSVReader.clean(columns[6]),                     
+                        CSVReader.clean(columns[7])                      
                     )
                 );
 
@@ -78,6 +77,8 @@ public class Main {
 
             System.out.printf("\nDados carregados: %d partidas, %d gols, %d cartões.\n", 
                                 partidas.size(), gols.size(), cartoes.size());
+
+            System.out.println(partidas.get(0).data());
 
             AnaliseService analiseService = new AnaliseService(partidas, gols, cartoes);
 

@@ -30,13 +30,18 @@ public class CSVReader {
         }
     }
 
-    public static LocalDate parseDate(String dateStr) {
-        try {
-            return LocalDate.parse(dateStr, DATE_FORMATTER);
-        } catch (Exception e) {
-            return null; 
-        }
+public static LocalDate parseDate(String dateStr) {
+    try {
+        if (dateStr == null) return null;
+        // Remove aspas e espaços (inclusive invisíveis)
+        String cleanDate = dateStr.replace("\"", "").replace("\u00A0", "").trim();
+        if (cleanDate.isEmpty()) return null;
+        return LocalDate.parse(cleanDate, DATE_FORMATTER);
+    } catch (Exception e) {
+        return null;
     }
+}
+
 
     public static int parseInt(String intStr) {
         try {
@@ -46,4 +51,10 @@ public class CSVReader {
             return 0; 
         }
     }
+
+    public static String clean(String text) {
+        if (text == null) return null;
+        return text.replace("\"", "").replace("\u00A0", "").trim();
+    }
+    
 }
