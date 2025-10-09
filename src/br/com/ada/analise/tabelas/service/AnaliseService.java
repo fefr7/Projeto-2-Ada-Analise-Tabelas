@@ -3,7 +3,6 @@ package br.com.ada.analise.tabelas.service;
 import br.com.ada.analise.tabelas.model.Cartao;
 import br.com.ada.analise.tabelas.model.Gol;
 import br.com.ada.analise.tabelas.model.Partida;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -57,12 +56,7 @@ public class AnaliseService {
         return gols.stream()
                 .parallel()
                 .filter(g -> g.atleta() != null && !g.atleta().trim().isEmpty())
-                .filter(g -> {
-                    String tipo = g.tipoDeGol().replace("\"", "").trim();
-                    return !tipo.equalsIgnoreCase("Penalty") && 
-                           !tipo.equalsIgnoreCase("Gol Contra") &&
-                           !tipo.isEmpty();
-                })
+                .filter(g -> !g.tipoDeGol().equalsIgnoreCase("Gol Contra"))
                 .collect(Collectors.groupingBy(Gol::atleta, Collectors.counting())) 
                 .entrySet().stream()
                 .max(Map.Entry.comparingByValue());
