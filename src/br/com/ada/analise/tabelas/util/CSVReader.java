@@ -33,7 +33,6 @@ public class CSVReader {
 public static LocalDate parseDate(String dateStr) {
     try {
         if (dateStr == null) return null;
-        // Remove aspas e espaços (inclusive invisíveis)
         String cleanDate = dateStr.replace("\"", "").replace("\u00A0", "").trim();
         if (cleanDate.isEmpty()) return null;
         return LocalDate.parse(cleanDate, DATE_FORMATTER);
